@@ -19,7 +19,13 @@ export async function POST(req:NextRequest){
  if(action==="logout"){const r=NextResponse.json({ok:true});r.cookies.set(ADMIN_COOKIE,"",{path:"/",maxAge:0});return r;}
  if(action==="open"||action==="close"){
   const {error}=await supabase.from("events").update({registration_open:action==="open"}).eq("id",1);
-  if(error)return NextResponse.json({error:"Could not update registration."},{status:500});
+  if(error) {
+  console.error("Registration update failed:", error);
+  return NextResponse.json(
+    {error: error.message, details: error.details, hint: error.hint},
+    {status:500}
+  );
+}
   return NextResponse.json({message:action==="open"?"Registration opened.":"Registration closed."});
  }
  if(action==="generate"){
